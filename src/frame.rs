@@ -1,8 +1,6 @@
-pub type Frame = Vec<Vec<&'static str>>;
+use crate::{NUM_COLS, NUM_ROWS};
 
-// TODO: fix the import issue these constants should come from lib.rs
-const NUM_ROWS: usize = 20;
-const NUM_COLS: usize = 40;
+pub type Frame = Vec<Vec<&'static str>>;
 
 pub fn new_frame() -> Frame {
     let mut cols = Vec::with_capacity(NUM_COLS);

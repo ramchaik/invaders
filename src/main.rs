@@ -1,7 +1,7 @@
-mod frame;
-mod render;
-mod lib;
-
+use invaders::{
+    frame,
+    render,
+};
 use std::{error::Error, io, time::Duration, sync::mpsc, thread};
 use crossterm::{terminal::{self, EnterAlternateScreen, LeaveAlternateScreen}, cursor::{Hide, Show}, ExecutableCommand, event::{self, KeyCode}};
 use rusty_audio::Audio;
