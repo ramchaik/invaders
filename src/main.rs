@@ -2,7 +2,7 @@ use invaders::{
     frame::{self, Drawable},
     render, player::Player,
 };
-use std::{error::Error, io, time::Duration, sync::mpsc, thread};
+use std::{error::Error, io, time::{Duration, Instant}, sync::mpsc, thread};
 use crossterm::{terminal::{self, EnterAlternateScreen, LeaveAlternateScreen}, cursor::{Hide, Show}, ExecutableCommand, event::{self, KeyCode}};
 use rusty_audio::Audio;
 
@@ -41,8 +41,11 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // Gameloop
     let mut player = Player::new();
+    let mut instant = Instant::now();
     'gameloop: loop {
         // Per frame init
+        let delta = instant.elapsed();
+        instant = Instant::now();
         let mut curr_frame = frame::new_frame();
 
         // Input
@@ -51,6 +54,11 @@ fn main() -> Result<(), Box<dyn Error>> {
                 match key_event.code {
                     KeyCode::Left => player.move_left(),
                     KeyCode::Right => player.move_right(),
+                    KeyCode::Char(' ') | KeyCode::Enter => {
+                        if player.shoot() {
+                            audio.play("pew");
+                        }
+                    },
                     KeyCode::Esc | KeyCode::Char('q') => {
                         audio.play("lose");
                         break 'gameloop;
@@ -59,6 +67,9 @@ fn main() -> Result<(), Box<dyn Error>> {
                 }
             }
         }
+
+        // Update
+        player.update(delta);
 
         // Draw & Render
         player.draw(&mut curr_frame);
