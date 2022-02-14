@@ -1,6 +1,6 @@
 use invaders::{
     frame::{self, Drawable},
-    render, player::Player,
+    render, player::Player, invaders::Invaders,
 };
 use std::{error::Error, io, time::{Duration, Instant}, sync::mpsc, thread};
 use crossterm::{terminal::{self, EnterAlternateScreen, LeaveAlternateScreen}, cursor::{Hide, Show}, ExecutableCommand, event::{self, KeyCode}};
@@ -42,6 +42,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Gameloop
     let mut player = Player::new();
     let mut instant = Instant::now();
+    let mut invaders = Invaders::new();
     'gameloop: loop {
         // Per frame init
         let delta = instant.elapsed();
@@ -70,9 +71,15 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         // Update
         player.update(delta);
+        if invaders.update(delta) {
+            audio.play("move");
+        }
 
         // Draw & Render
-        player.draw(&mut curr_frame);
+        let drawables: Vec<&dyn Drawable> = vec![&player, &invaders];
+        for drawable in drawables {
+            drawable.draw(&mut curr_frame);
+        }
         let _ = render_tx.send(curr_frame);
         thread::sleep(Duration::from_millis(1));
     }
